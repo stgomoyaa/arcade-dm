@@ -121,7 +121,7 @@ enum _:UiSlots {
 
 new const Float:UI_POS[UiSlots][2] = {
     { 0.02, 0.18 }, { 0.55, 0.40 }, { -1.0, 0.30 }, { 0.02, 0.50 },
-    { 0.60, 0.045 }, { 0.58, 0.010 }, { 0.02, 0.26 }
+    { 0.60, 0.045 }, { 0.58, 0.010 }, { 0.02, 0.33 }
 }
 
 #define UI_CH_HUD      1
@@ -1768,3 +1768,4 @@ save_data() {
     }
     nvault_set(g_vault, "weapons", buf)
 }
+
