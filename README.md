@@ -107,14 +107,18 @@ Type **`guns`** in chat to change your loadout: 10 primaries, 5 secondaries, rem
 GoldSrc has only 16 message channels, and any plugin using automatic channel selection (`-1`) can paint over another. This mod pins them:
 
 ```
- 1  persistent status        6-10  killfeed
- 2  point popups              11   combo banner
- 3  panels (tables)           12   active buffs
- 4  large announcements      13-15 damage numbers
- 5  animations
+ 1  persistent status        6-9   killfeed
+ 2  point popups             10    (free)
+ 3  panels (tables)          11    combo banner
+ 4  large announcements      12    active buffs
+ 5  animations               13    damage numbers
+                             14-15 (free)
 ```
 
-If you add another HUD plugin, give it a free channel or you will see flicker.
+If you add another HUD plugin, give it one of the free channels. Two rules learned the hard way:
+
+- **Never use `-1`.** Automatic selection can land on a channel this mod already owns and blank it. Several stock AMX Mod X plugins do this — `timeleft`, `adminchat`, `statsx` — and the symptom is the status block vanishing for a second at a time.
+- **Do not re-send the same channel more than a few times per second.** Re-sending restarts the message client side, which reads as flicker. The status block here is only re-sent when its text actually changes, and at most every 0.35 s.
 
 ## What this does not do
 

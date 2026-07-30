@@ -86,7 +86,7 @@
 #define UAV_TICK        0.2
 #define UAV_TICKS     300      // 300 x 0.2 s = one minute
 
-#define FEED_LINES      5
+#define FEED_LINES      4
 #define FEED_HOLD       5.0
 #define RIVALS         32
 
@@ -132,7 +132,7 @@ new const Float:UI_POS[UiSlots][2] = {
 #define UI_CH_FEED     6      // 6..10
 #define UI_CH_FEEDBAN 11
 #define UI_CH_STATUS  12
-#define UI_CH_DAMAGE  13      // 13..15
+#define UI_CH_DAMAGE  13      // 14-15 left free on purpose
 
 #define UI_TICK        0.1
 #define UI_ANIM_PULSE  0
@@ -723,7 +723,7 @@ public ham_damage_post(victim, inflictor, attacker, Float:damage, bits) {
     }
 
     // reserved channels 13..15: never steal the HUD or killfeed channels
-    set_hudmessage(255, 190, 60, x, y, 0, 0.0, 0.5, 0.0, 0.2, UI_CH_DAMAGE + (g_dmgDir[attacker] % 3))
+    set_hudmessage(255, 190, 60, x, y, 0, 0.0, 0.5, 0.0, 0.2, UI_CH_DAMAGE)
     show_hudmessage(attacker, "%d", floatround(damage))
 
     if (++g_dmgDir[attacker] > 5)
@@ -1768,4 +1768,5 @@ save_data() {
     }
     nvault_set(g_vault, "weapons", buf)
 }
+
 
