@@ -1,12 +1,12 @@
-# compilados locales de prueba
+# local compiler leftovers
 *.amx
 qconsole.log
 
-# datos de partida (progreso personal, no versionar)
+# match data (personal progression, not versioned)
 addons/amxmodx/data/
 *.vault
 *.journal
 
-# sistema
+# OS
 Thumbs.db
 desktop.ini
