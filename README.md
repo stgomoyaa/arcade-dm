@@ -1,118 +1,138 @@
 # Arcade DM
 
-Deathmatch arcade **todo-en-uno** para Counter-Strike 1.6 y Condition Zero. Un solo plugin de AMX Mod X que convierte una partida local contra bots en un entrenamiento de puntería con progresión, recompensas y dopamina constante.
+*One plugin. Your bot match becomes a ranked aim trainer.*
 
-Pensado para jugar **solo contra bots** (YaPB o los ZBot nativos de CZ) y usarlo como calentamiento serio antes de un juego táctico moderno.
+**An all-in-one arcade deathmatch mod for Counter-Strike 1.6 and Condition Zero: 11 ranks, two independent ladders, 22 medals and a five line killfeed, in a single 1,770 line AMX Mod X plugin with no external dependencies.**
 
-![license](https://img.shields.io/badge/license-MIT-green) ![amxx](https://img.shields.io/badge/AMX%20Mod%20X-1.9%2B-blue)
+![license](https://img.shields.io/badge/license-MIT-green) ![amxx](https://img.shields.io/badge/AMX%20Mod%20X-1.9%2B-blue) ![game](https://img.shields.io/badge/game-CS%201.6%20%2F%20CZ-orange)
 
----
+[The ladder](#the-ladder) · [What it does](#what-it-does) · [Install](#install) · [Bots](#bots) · [Cvars](#cvars) · [HUD channels](#hud-channels) · [What this does not do](#what-this-does-not-do) · [Credits](#credits)
 
-## Qué hace
+Built for playing alone against bots, as a warmup before a modern tactical shooter. It turns a local listen server into something with progression, rewards and constant feedback, without a server, an account or a database.
 
-**FFA de verdad.** El motor de GoldSrc recorta el daño entre compañeros al ~35 %; el plugin lo compensa para que todos peguen igual, elimina los avisos de *teamkill*, quita castigos, corrige el marcador y limpia el radar de aliados. En la práctica: todo el mundo contra todo el mundo, sin fricción.
+## The ladder
 
-**Killfeed propio.** Reemplaza el monocromo del juego por uno de cinco líneas a color: tus bajas en dorado, headshots en naranja, tus muertes en rojo, el ruido de fondo en gris. Cada línea muestra el rango de ambos jugadores.
+Two ladders run at once and they measure different things. Points measure how dominant you are. Aim measures how well you shoot, and it does not drop when you die.
 
-**Dos progresiones separadas.**
+| Rank | Tag | Points | Aim rating | Bonus per kill |
+|---|---|---|---|---|
+| Iron | `IRN` | 0 | 0 | 0 |
+| Bronze | `BRZ` | 100 | 40 | 0 |
+| Silver | `SIL` | 250 | 47 | 1 |
+| Gold | `GLD` | 500 | 53 | 2 |
+| Platinum | `PLT` | 900 | 58 | 3 |
+| Diamond | `DIA` | 1,500 | 63 | 5 |
+| Master | `MAS` | 2,300 | 68 | 7 |
+| Grandmaster | `GM` | 3,400 | 73 | 10 |
+| **CHAMPION** | `CHM` | 5,000 | 78 | 14 |
+| **KING** | `KNG` | 15,000 | 84 | 20 |
+| **DEITY** | `DTY` | 40,000 | 90 | 30 |
 
-| | Qué mide | Escalera |
-|---|---|---|
-| **Puntos** | Qué tan dominante eres | Hierro → Grandmaster (divisiones I/II/III) → **CAMPEÓN** #15000→#1 nacional → **REY** regional → **DEIDAD** mundial → prestigio |
-| **Puntería** | Qué tan bien disparas | La misma escalera, pero calculada sobre la *calidad* de cada baja |
+Iron through Grandmaster carry divisions I, II and III. The top three ranks swap divisions for a numbered ladder: CHAMPION places you nationally from #15000 down to #1, KING regionally, DEITY globally.
 
-El rango de puntería es una media móvil de: headshot, tiempo hasta la baja (TTK), **disciplina de parada** (tu velocidad en el disparo que mata — el counter-strafe) y **economía de disparo** (impactos hasta la baja, con listón distinto por arma). No baja al morir: mide cómo disparas, no cómo sobrevives. Está calibrado con los porcentajes de headshot reales del CS competitivo, y los tres rangos superiores **no se alcanzan solo con HS%**: exigen las cuatro cosas.
+The aim rating is a moving average of four things, not one:
 
-**Combos sincronizados.** Doble → Triple → Ultra → Monster → Ludicrous → Holy Shit → Wicked Sick → Cadena. El sonido, el banner, la medalla y el buff salen de **una sola tabla**, así que caen en el mismo instante y con el mismo nombre.
+- **Headshot rate**, calibrated against real competitive CS percentages.
+- **Time to kill**, from first contact to the kill.
+- **Stopping discipline**, your velocity on the shot that kills, which is the counter-strafe.
+- **Shot economy**, hits needed per kill, with a different bar per weapon.
 
-**Recompensas por racha.**
+The top three aim ranks are not reachable on headshot rate alone. All four have to be there.
 
-- **4 rápidas** → Vampiro: cada baja te cura, hasta que mueras
-- **5 rápidas** (Monster kill) → Vampiro++: además recarga el arma al máximo en cada baja
-- **9 rápidas** (Cadena) → **Tiempo bala**: los bots caen al 40 % de velocidad 5 s
-- **Racha 15** → **UAV**: ESP a través de paredes, un barrido cada 5 s durante un minuto
-- **Racha 30** → **NUKE**: cae el mapa entero y todas las bajas cuentan para ti
+> [!NOTE]
+> Every threshold in that table is read from `RANK_MIN`, `AIM_MIN` and `RANK_KILL_BONUS` in the source. Nothing here is rounded for presentation.
 
-**22 medallas** estilo Black Ops II con bonus de puntos, **leaderboard** con 32 rivales que progresan contigo, **némesis** (el bot que más te mata), **killcam** al morir, equipamiento automático, bunnyhop y números de daño flotantes.
+## What it does
 
----
+**Real FFA.** GoldSrc cuts damage between teammates to roughly 35%. The plugin compensates so everyone hits for full, removes teamkill warnings and punishments, fixes the scoreboard and clears friendlies off the radar.
 
-## Instalación
+**Its own killfeed.** Five colour coded lines replacing the game's monochrome one: your kills in gold, headshots in orange, your deaths in red, background noise in grey. Every line carries both players' rank tags.
 
-1. Requisitos: **AMX Mod X 1.9 o superior** con los módulos `fun`, `engine`, `fakemeta`, `hamsandwich`, `cstrike`, `nvault` activados en `configs/modules.ini`.
-2. Copia `addons/amxmodx/plugins/arcade_dm.amxx` a `cstrike/addons/amxmodx/plugins/`.
-3. Añade `arcade_dm.amxx` al final de `cstrike/addons/amxmodx/configs/plugins.ini`.
-4. Copia el contenido de `configs/listenserver.cfg` a tu `cstrike/listenserver.cfg`.
-5. (Opcional) Sonidos: coloca los `.wav` en `cstrike/sound/AQS/`. Sin ellos el mod funciona igual, solo en silencio. Ver [Sonidos](#sonidos).
+**Synchronised combos.** Double, Triple, Ultra, Monster, Ludicrous, Holy Shit, Wicked Sick, Kill Chain. The sound, the banner, the medal and the buff all come out of one table, so they fire on the same frame with the same name.
 
-Para compilar desde el fuente:
+**Streak rewards.**
+
+| Trigger | Reward |
+|---|---|
+| 4 fast kills | Vampire: every kill heals you until you die |
+| 5 fast kills (Monster) | Vampire++: also refills the magazine on every kill |
+| 9 fast kills (Chain) | Bullet time: bots drop to 40% speed for 5 seconds |
+| 15 streak | UAV: wallhack ESP, one sweep every 5 seconds for a minute |
+| 30 streak | NUKE: the map goes down and every kill counts for you |
+
+**22 Black Ops II style medals** with point bonuses, a **32 rival leaderboard** that progresses alongside you, a **nemesis** (the bot that kills you most), a **killcam** on death, auto equipment, bunnyhop and floating damage numbers.
+
+## Install
+
+Requires **AMX Mod X 1.9 or newer** with the `fun`, `engine`, `fakemeta`, `hamsandwich`, `cstrike` and `nvault` modules enabled in `configs/modules.ini`.
+
+1. Copy `addons/amxmodx/plugins/arcade_dm.amxx` into `cstrike/addons/amxmodx/plugins/`.
+2. Append `arcade_dm.amxx` to `cstrike/addons/amxmodx/configs/plugins.ini`.
+3. Copy the contents of `configs/listenserver.cfg` into your `cstrike/listenserver.cfg`.
+4. Optional: drop the `.wav` files into `cstrike/sound/AQS/`. Without them the mod runs identically, just silent.
+
+To compile from source:
 
 ```bash
 amxxpc addons/amxmodx/scripting/arcade_dm.sma -o addons/amxmodx/plugins/arcade_dm.amxx
 ```
 
----
-
 ## Bots
 
-El plugin no incluye bots: usa los que ya tengas.
+The plugin ships no bots. Use whichever you already have.
 
-- **CS 1.6**: [YaPB](https://github.com/yapb/yapb) es la opción recomendada (compatible con el build actual del juego). El plugin ajusta `yb_difficulty` automáticamente según tu rango de puntería, con tope suave para no romper el ritmo arcade.
-- **Condition Zero**: los ZBot nativos funcionan sin nada extra.
+- **CS 1.6:** [YaPB](https://github.com/yapb/yapb) is the recommended option and is compatible with the current game build. The plugin adjusts `yb_difficulty` to follow your aim rank, capped so the arcade pace survives.
+- **Condition Zero:** the native ZBots work with nothing extra.
 
-> **Aviso**: en CS 1.6 actual (build post-aniversario), los packs antiguos que reemplazan `mp.dll` con binarios de 2006 **crashean el juego**. Usa YaPB o ReGameDLL, no esos packs.
-
----
+> [!WARNING]
+> On the current CS 1.6 build (post anniversary), old bot packs that replace `mp.dll` with 2006 binaries **crash the game**. Use YaPB or ReGameDLL, not those packs.
 
 ## Cvars
 
-| Cvar | Def. | Qué hace |
+| Cvar | Default | What it does |
 |---|---|---|
-| `adm_ffa` | 1 | FFA: daño completo entre equipos, sin avisos de teamkill, radar limpio |
-| `adm_killfeed` | 1 | Killfeed propio (0 = deja el original del juego) |
-| `adm_equip` | 1 | Armas automáticas al reaparecer |
-| `adm_bhop` | 1 | Bunnyhop automático |
-| `adm_sounds` | 1 | Anuncios de voz estilo Quake |
-| `adm_damage_numbers` | 1 | Números de daño flotantes |
-| `adm_streaks` | 1 | Vampiro, tiempo bala, UAV y nuke |
-| `adm_adaptive_bots` | 1 | La dificultad de los bots sigue a tu puntería (tope 2 de 4) |
+| `adm_ffa` | 1 | Full damage between teams, no teamkill warnings, clean radar |
+| `adm_killfeed` | 1 | Custom killfeed (0 leaves the game's own) |
+| `adm_equip` | 1 | Automatic weapons on respawn |
+| `adm_bhop` | 1 | Automatic bunnyhop |
+| `adm_sounds` | 1 | Quake style voice announcements |
+| `adm_damage_numbers` | 1 | Floating damage numbers |
+| `adm_streaks` | 1 | Vampire, bullet time, UAV and nuke |
+| `adm_adaptive_bots` | 1 | Bot difficulty follows your aim rating (capped at 2 of 4) |
 
-Escribe **`guns`** en el chat para cambiar tu equipamiento (10 primarias, 5 secundarias). Se recuerda toda la sesión.
+Type **`guns`** in chat to change your loadout: 10 primaries, 5 secondaries, remembered for the session.
 
----
+## HUD channels
 
-## Sonidos
-
-El mod busca los `.wav` en `sound/AQS/`. Son los clásicos anuncios de Quake/UT, disponibles en el repositorio [AdvancedQuakeSounds](https://github.com/ClaudiuHKS/AdvancedQuakeSounds) de ClaudiuHKS.
-
-Archivos que usa: `doublekill`, `triplekill`, `ultrakill`, `monsterkill`, `ludicrouskill`, `holyshit`, `whickedsick`, `comboking`, `impressive`, `payback`, `shutdown`, `flawlessvictory`.
-
----
-
-## Canales de HUD
-
-GoldSrc solo tiene 16 canales de mensaje y cualquier plugin que use canal automático (`-1`) puede pisar a otro. Aquí están repartidos de forma fija:
+GoldSrc has only 16 message channels, and any plugin using automatic channel selection (`-1`) can paint over another. This mod pins them:
 
 ```
- 1  estado permanente        6-10  killfeed
- 2  popups de puntos          11   banner de combo
- 3  paneles (tablas)          12   buffs activos
- 4  anuncios grandes         13-15 números de daño
- 5  animaciones
+ 1  persistent status        6-10  killfeed
+ 2  point popups              11   combo banner
+ 3  panels (tables)           12   active buffs
+ 4  large announcements      13-15 damage numbers
+ 5  animations
 ```
 
-Si añades otro plugin con HUD, dale un canal libre o verás parpadeos.
+If you add another HUD plugin, give it a free channel or you will see flicker.
 
----
+## What this does not do
 
-## Créditos
+- **It is built for a listen server against bots.** Nothing in it is designed or tested for a populated dedicated server. Progression is local, held in `nvault`, and the 32 leaderboard rivals are simulated, not real players.
+- **It ships no bots and no sounds.** Both are third party, and the sound pack is somebody else's work under its own terms. The mod degrades cleanly without either.
+- **It occupies 15 of the 16 GoldSrc HUD channels.** That is most of the budget. Any other HUD plugin has to fit in what is left, and there is no negotiation at runtime.
+- **The national, regional and global ladders are flavour, not a network.** CHAMPION through DEITY place you on a numbered ladder computed locally. There is no server aggregating players.
+- **Only tested on the current CS 1.6 build and Condition Zero.** No claim is made about ReHLDS variants, older builds, or CS: Online forks.
+- **The aim rating is opinionated.** Its thresholds were calibrated against competitive CS headshot percentages, which is a judgement call, not a measurement of you against a population.
 
-- **Vampiro**: basado en el plugin *Vampire* de **Shalfey** (2007), convertido aquí en buff persistente.
-- **ESP a través de paredes**: técnica del ESP de *AmxX Cheats* de **DarkGL** — el marcador se proyecta sobre la pared donde impacta el trazo, porque los beams se ocluyen con la geometría.
-- **Números de daño**: adaptado del *Rotating DMG 6-dir HUD* de **LyesMC**.
-- **Sonidos**: pack *AdvancedQuakeSounds* de **ClaudiuHKS**.
-- Rangos, ladder, medallas, combos, killfeed, tiempo bala y sistema de puntería: originales de este proyecto.
+## Credits
 
-## Licencia
+- **Vampire:** based on the *Vampire* plugin by **Shalfey** (2007), turned into a persistent buff here.
+- **Wallhack ESP:** technique from **DarkGL**'s ESP in *AmxX Cheats*. The marker projects onto the wall the trace hits, because beams occlude against geometry.
+- **Damage numbers:** adapted from **LyesMC**'s *Rotating DMG 6-dir HUD*.
+- **Sounds:** the *AdvancedQuakeSounds* pack by **ClaudiuHKS**, available [here](https://github.com/ClaudiuHKS/AdvancedQuakeSounds). Files used: `doublekill`, `triplekill`, `ultrakill`, `monsterkill`, `ludicrouskill`, `holyshit`, `whickedsick`, `comboking`, `impressive`, `payback`, `shutdown`, `flawlessvictory`.
+- Ranks, ladder, medals, combos, killfeed, bullet time and the aim rating system are original to this project.
 
-MIT — ver [LICENSE](LICENSE).
+## License
+
+MIT. See [LICENSE](LICENSE).
