@@ -1,0 +1,12 @@
+# compilados locales de prueba
+*.amx
+qconsole.log
+
+# datos de partida (progreso personal, no versionar)
+addons/amxmodx/data/
+*.vault
+*.journal
+
+# sistema
+Thumbs.db
+desktop.ini
