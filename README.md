@@ -135,4 +135,4 @@ If you add another HUD plugin, give it a free channel or you will see flicker.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). Third-party attributions are in [NOTICE.md](NOTICE.md).
